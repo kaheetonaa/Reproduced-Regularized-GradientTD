@@ -285,7 +285,6 @@ def _(
                 # tell the data collector we're done collecting data for this env/learner/rep combination
                 collector.reset()
 
-
     return collector, rmspbe
 
 
@@ -364,75 +363,75 @@ def _(
     np,
 ):
     import math
-    def alpha_sensitivity(_range,_max):
+    def alpha_sensitivity(_range_min,_range_max,_max):
 
         # -----------------------------------
         # Collect the data for the experiment
         # -----------------------------------
-    
+
         # a convenience object to store data collected during runs
         # H: update alpha sensitivity in _range from 0 to 5, return collectors with key=alpha, value=collector   
         collector = Collector()
-        for alpha_power in range(_range):
+        for alpha_power in range(_range_min,_range_max):
             alpha=2**(-alpha_power)
 
             for run in range(RUNS):
                 for problem in PROBLEMS:
                     for Learner in LEARNERS:
-                    
+
                         problem['stepsizes'][Learner.__name__]=alpha
                         # for reproducibility, set the random seed for each run
                         # also reset the seed for each learner, so we guarantee each sees the same data
                         np.random.seed(run)
-    
+
                         # build a new instance of the environment each time
                         # just to be sure we don't bleed one learner into the next
                         Env = problem['env']
                         env = Env()
-    
+
                         target = problem['target']
                         behavior = problem['behavior']
-    
+
                         Rep = problem['representation']
                         rep = Rep()
-    
+
                         print(run, Env.__name__, Rep.__name__, Learner.__name__)
-    
+
                         # build the X, P, R, and D matrices for computing RMSPBE
                         X, P, R, D = env.getXPRD(target, rep)
                         RMSPBE = buildRMSPBE(X, P, R, D, problem['gamma'])
-    
+
                         # build a new instance of the learning algorithm
                         learner = Learner(rep.features(), {
                             'gamma': problem['gamma'],
                             'alpha': alpha,
                             'beta': 1,
                         })
-    
+
                         # build an "agent" which selects actions according to the behavior
                         # and tries to estimate according to the target policy
                         agent = RlGlueCompatWrapper(learner, behavior, target, rep.encode)
-    
+
                         # for Baird's counter-example, set the initial value function manually
                         if problem.get('starting_condition') is not None:
                             learner.w = problem['starting_condition'].copy()
-    
+
                         # build the experiment runner
                         # ties together the agent and environment
                         # and allows executing the agent-environment interface from Sutton-Barto
                         glue = RlGlue(agent, env)
-    
+
                         # start the episode (env produces a state then agent produces an action)
                         glue.start()
                         for step in range(problem['steps']):
                             # interface sends action to env and produces a next-state and reward
                             # then sends the next-state and reward to the agent to make an update
                             _, _, _, terminal = glue.step()
-    
+
                             # when we hit a terminal state, start a new episode
                             if terminal:
                                 glue.start()
-    
+
                             # evaluate the RMPSBE
                             # subsample to reduce computational cost
                             if step % 100 == 0: 
@@ -445,13 +444,13 @@ def _(
                                 data_key = f'{alpha_power}-{Env.__name__}-{Rep.__name__}-{Learner.__name__}'
                                 # store the data in the "collector" until we need it for plotting
                                 collector.collect(data_key, rmspbe)
-    
+
                         # tell the data collector we're done collecting data for this env/learner/rep combination
                         collector.reset()
         return collector
 
 
-    alpha_sensitivity=alpha_sensitivity(8,9e+200)
+    alpha_sensitivity=alpha_sensitivity(0,8,9e+200)
     return alpha_sensitivity, math
 
 
@@ -459,34 +458,34 @@ def _(
 def _(LEARNERS, PROBLEMS):
     import pandas as pd
 
-    def plot_compare_sensitivity(collector,_range):
+    def plot_compare_sensitivity(collector,_range_min,_range_max,top_lim,bot_lim):
         # ---------------------
         # Plotting the bar plot
         # ---------------------
         import matplotlib.pyplot as plt
 
         # get TDRC's baseline performance for each problem
-        baselines = [None] * len(PROBLEMS) * _range
-        for alpha_power in range(_range):
-        
+        baselines = [None] * len(PROBLEMS) * (_range_max-_range_min)
+        for alpha_power in range(_range_min,_range_max):
+
             for i, problem in enumerate(PROBLEMS):
                 env = problem['env'].__name__
                 rep = problem['representation'].__name__
-    
+
                 mean_curve, _, _ = collector.getStats(f'{alpha_power}-{env}-{rep}-TDRC')
-    
+
                 # compute TDRC's AUC
                 baselines[alpha_power*len(PROBLEMS)+i] = mean_curve.mean()
         print(baselines)
-        
+
 
         #H: DF index =-alpha_power, learner: columns, 
         _rep=[i["representation"].__name__ for i in PROBLEMS]
         _lea=[i.__name__ for i in LEARNERS]
         data={i:{j:[] for j in _lea} for i in _rep}
-    
-    
-        for alpha_power in range(_range):
+
+
+        for alpha_power in range(_range_min,_range_max):
             for i, problem in enumerate(PROBLEMS):
                 # additional offset between problems
                 # creates space between the problems
@@ -494,22 +493,22 @@ def _(LEARNERS, PROBLEMS):
                     learner = Learner.__name__
                     env = problem['env'].__name__
                     rep = problem['representation'].__name__
-    
+
                     x = -alpha_power
-    
+
                     mean_curve, stderr_curve, runs = collector.getStats(f'{alpha_power}-{env}-{rep}-{learner}')
                     auc = mean_curve.mean()
                     auc_stderr = stderr_curve.mean()
-    
+
                     relative_auc = auc / baselines[alpha_power * len(PROBLEMS)+i]
                     relative_stderr = auc_stderr / baselines[alpha_power * len(PROBLEMS)+i]
                     data[rep][learner]+={auc}
-                
+
         #return plt.show()
         for _r in _rep:
             df=pd.DataFrame(data[_r])
             plot=df.plot(title=_r)
-            plot.set_ylim(top=2,bottom=0) 
+            plot.set_ylim(top=top_lim,bottom=bot_lim) 
         return plt.show()
 
 
@@ -519,19 +518,7 @@ def _(LEARNERS, PROBLEMS):
 
 @app.cell
 def _(alpha_sensitivity, plot_compare_sensitivity):
-    plot_compare_sensitivity(alpha_sensitivity,8)
-    return
-
-
-@app.cell
-def _(alpha_sensitivity):
-    alpha_sensitivity.all_data["2-Baird-BairdRep-GTD2"]
-    return
-
-
-@app.cell
-def _(alpha_sensitivity):
-    alpha_sensitivity.getStats('2-RandomWalk-TabularRep-TDC')
+    plot_compare_sensitivity(alpha_sensitivity,0,8,top_lim=2,bot_lim=0)
     return
 
 
@@ -550,41 +537,41 @@ def _(
     math,
     np,
 ):
-    def eta_sensitivity(_range,_max):
+    def eta_sensitivity(_range_min,_range_max,_max):
 
         # -----------------------------------
         # Collect the data for the experiment
         # -----------------------------------
-    
+
         # a convenience object to store data collected during runs
         # H: update alpha sensitivity in _range from 0 to 5, return collectors with key=alpha, value=collector   
         collector = Collector()
-        for eta in range(_range):
+        for eta in range(_range_min,_range_max):
             for run in range(RUNS):
                 for problem in PROBLEMS:
                     for Learner in LEARNERS:
-                    
+
                         # for reproducibility, set the random seed for each run
                         # also reset the seed for each learner, so we guarantee each sees the same data
                         np.random.seed(run)
-    
+
                         # build a new instance of the environment each time
                         # just to be sure we don't bleed one learner into the next
                         Env = problem['env']
                         env = Env()
-    
+
                         target = problem['target']
                         behavior = problem['behavior']
-    
+
                         Rep = problem['representation']
                         rep = Rep()
-    
+
                         print(run, Env.__name__, Rep.__name__, Learner.__name__)
-    
+
                         # build the X, P, R, and D matrices for computing RMSPBE
                         X, P, R, D = env.getXPRD(target, rep)
                         RMSPBE = buildRMSPBE(X, P, R, D, problem['gamma'])
-    
+
                         # build a new instance of the learning algorithm
                         if Learner in [HTD,GTD2,TDRC]:
                             learner = Learner(rep.features(), {
@@ -599,31 +586,31 @@ def _(
                                     'alpha': problem['stepsizes'][Learner.__name__],
                                     'beta': 1,
                                 })
-    
+
                         # build an "agent" which selects actions according to the behavior
                         # and tries to estimate according to the target policy
                         agent = RlGlueCompatWrapper(learner, behavior, target, rep.encode)
-    
+
                         # for Baird's counter-example, set the initial value function manually
                         if problem.get('starting_condition') is not None:
                             learner.w = problem['starting_condition'].copy()
-    
+
                         # build the experiment runner
                         # ties together the agent and environment
                         # and allows executing the agent-environment interface from Sutton-Barto
                         glue = RlGlue(agent, env)
-    
+
                         # start the episode (env produces a state then agent produces an action)
                         glue.start()
                         for step in range(problem['steps']):
                             # interface sends action to env and produces a next-state and reward
                             # then sends the next-state and reward to the agent to make an update
                             _, _, _, terminal = glue.step()
-    
+
                             # when we hit a terminal state, start a new episode
                             if terminal:
                                 glue.start()
-    
+
                             # evaluate the RMPSBE
                             # subsample to reduce computational cost
                             if step % 100 == 0: 
@@ -636,22 +623,127 @@ def _(
                                 data_key = f'{eta}-{Env.__name__}-{Rep.__name__}-{Learner.__name__}'
                                 # store the data in the "collector" until we need it for plotting
                                 collector.collect(data_key, rmspbe)
-    
+
                         # tell the data collector we're done collecting data for this env/learner/rep combination
                         collector.reset()
         return collector
 
 
-    eta_sensitivity=eta_sensitivity(8,9e+200)
+    eta_sensitivity=eta_sensitivity(-8,8,9e+200)
+    return (eta_sensitivity,)
+
+
+@app.cell
+def _(eta_sensitivity, plot_compare_sensitivity):
+    plot_compare_sensitivity(eta_sensitivity,-8,8,top_lim=1,bot_lim=0)
     return
 
 
-app._unparsable_cell(
-    r"""
-    +
-    """,
-    name="_"
-)
+@app.cell
+def _(
+    Collector,
+    LEARNERS,
+    PROBLEMS,
+    RUNS,
+    RlGlue,
+    RlGlueCompatWrapper,
+    buildRMSPBE,
+    eta,
+    math,
+    np,
+):
+    def beta_sensitivity(_range_min,_range_max,_max):
+
+        # -----------------------------------
+        # Collect the data for the experiment
+        # -----------------------------------
+
+        # a convenience object to store data collected during runs
+        # H: update alpha sensitivity in _range from 0 to 5, return collectors with key=alpha, value=collector   
+        collector = Collector()
+        for beta in range(_range_min,_range_max):
+            for run in range(RUNS):
+                for problem in PROBLEMS:
+                    for Learner in LEARNERS:
+
+                        # for reproducibility, set the random seed for each run
+                        # also reset the seed for each learner, so we guarantee each sees the same data
+                        np.random.seed(run)
+
+                        # build a new instance of the environment each time
+                        # just to be sure we don't bleed one learner into the next
+                        Env = problem['env']
+                        env = Env()
+
+                        target = problem['target']
+                        behavior = problem['behavior']
+
+                        Rep = problem['representation']
+                        rep = Rep()
+
+                        print(run, Env.__name__, Rep.__name__, Learner.__name__)
+
+                        # build the X, P, R, and D matrices for computing RMSPBE
+                        X, P, R, D = env.getXPRD(target, rep)
+                        RMSPBE = buildRMSPBE(X, P, R, D, problem['gamma'])
+
+                        # build a new instance of the learning algorithm
+                        learner = Learner(rep.features(), {
+                            'gamma': problem['gamma'],
+                            'alpha': problem['stepsizes'][Learner.__name__],
+                            'beta': beta,
+                        })
+
+                        # build an "agent" which selects actions according to the behavior
+                        # and tries to estimate according to the target policy
+                        agent = RlGlueCompatWrapper(learner, behavior, target, rep.encode)
+
+                        # for Baird's counter-example, set the initial value function manually
+                        if problem.get('starting_condition') is not None:
+                            learner.w = problem['starting_condition'].copy()
+
+                        # build the experiment runner
+                        # ties together the agent and environment
+                        # and allows executing the agent-environment interface from Sutton-Barto
+                        glue = RlGlue(agent, env)
+
+                        # start the episode (env produces a state then agent produces an action)
+                        glue.start()
+                        for step in range(problem['steps']):
+                            # interface sends action to env and produces a next-state and reward
+                            # then sends the next-state and reward to the agent to make an update
+                            _, _, _, terminal = glue.step()
+
+                            # when we hit a terminal state, start a new episode
+                            if terminal:
+                                glue.start()
+
+                            # evaluate the RMPSBE
+                            # subsample to reduce computational cost
+                            if step % 100 == 0: 
+                                w = learner.getWeights()
+                                rmspbe = RMSPBE(w)
+                                if math.isinf(rmspbe) or math.isnan(rmspbe): #rmspbe>_max
+                                    rmspbe=_max
+                                    terminal=True
+                                #  create a unique key to store the data for this env/representation/agent tuple
+                                data_key = f'{eta}-{Env.__name__}-{Rep.__name__}-{Learner.__name__}'
+                                # store the data in the "collector" until we need it for plotting
+                                collector.collect(data_key, rmspbe)
+
+                        # tell the data collector we're done collecting data for this env/learner/rep combination
+                        collector.reset()
+        return collector
+
+
+    beta_sensitivity=beta_sensitivity(0,8,9e+200)
+    return (beta_sensitivity,)
+
+
+@app.cell
+def _(beta_sensitivity, plot_compare_sensitivity):
+    plot_compare_sensitivity(beta_sensitivity,0,8,top_lim=1,bot_lim=0)
+    return
 
 
 if __name__ == "__main__":
