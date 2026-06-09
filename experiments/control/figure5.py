@@ -75,3 +75,4 @@ for Learner in LEARNERS:
 
 plt.legend()
 plt.show()
+plt.savefig("fig5.jpg")
