@@ -1,0 +1,41 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.23.6",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "466de24d71bf0696a3babc3e91107b25",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "interruption",
+          "evalue": "This cell was interrupted and needs to be re-run",
+          "traceback": []
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "QRC 0 0 1000\nQRC 0 1 1000\nQRC 0 2 390\nQRC 0 3 391\nQRC 0 4 872\nQRC 0 5 811\nQRC 0 6 1000\nQRC 0 7 598\nQRC 0 8 522\nQRC 0 9 1000\nQRC 0 10 883\nQRC 0 11 1000\nQRC 0 12 1000\nQRC 0 13 1000\nQRC 0 14 306\nQRC 0 15 283\nQRC 0 16 158\nQRC 0 17 143\nQRC 0 18 195\nQRC 0 19 147\nQRC 0 20 383\nQRC 0 21 203\nQRC 0 22 136\nQRC 0 23 532\nQRC 0 24 355\nQRC 0 25 722\nQRC 0 26 925\nQRC 0 27 224\nQRC 0 28 504\nQRC 0 29 291\nQRC 0 30 148\nQRC 0 31 232\nQRC 0 32 134\nQRC 0 33 352\nQRC 0 34 98\nQRC 0 35 135\nQRC 0 36 272\nQRC 0 37 141\nQRC 0 38 145\nQRC 0 39 120\nQRC 0 40 164\nQRC 0 41 164\nQRC 0 42 127\nQRC 0 43 150\nQRC 0 44 159\nQRC 0 45 136\nQRC 0 46 99\nQRC 0 47 151\nQRC 0 48 154\nQRC 0 49 163\nQRC 0 50 161\nQRC 0 51 200\nQRC 0 52 103\nQRC 0 53 155\nQRC 0 54 166\nQRC 0 55 91\nQRC 0 56 149\nQRC 0 57 268\nQRC 0 58 248\nQRC 0 59 196\nQRC 0 60 164\nQRC 0 61 162\nQRC 0 62 180\nQRC 0 63 158\nQRC 0 64 130\nQRC 0 65 156\nQRC 0 66 157\nQRC 0 67 154\nQRC 0 68 113\nQRC 0 69 170\nQRC 0 70 145\nQRC 0 71 139\nQRC 0 72 123\nQRC 0 73 168\nQRC 0 74 154\nQRC 0 75 161\nQRC 0 76 152\nQRC 0 77 157\nQRC 0 78 173\nQRC 0 79 149\nQRC 0 80 115\nQRC 0 81 160\nQRC 0 82 145\nQRC 0 83 182\nQRC 0 84 141\nQRC 0 85 139\nQRC 0 86 111\nQRC 0 87 171\nQRC 0 88 160\nQRC 0 89 166\nQRC 0 90 162\nQRC 0 91 156\nQRC 0 92 153\nQRC 0 93 90\nQRC 0 94 162\nQRC 0 95 242\nQRC 0 96 166\nQRC 0 97 272\nQRC 0 98 186\nQRC 0 99 144\nQC 0 0 1000\nQC 0 1 1000\nQC 0 2 1000\nQC 0 3 1000\nQC 0 4 1000\n",
+          "mimetype": "text/plain"
+        },
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;/tmp/marimo_2123/__marimo__cell_Hbol_.py&quot;</span>, line <span class=\"m\">57</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"n\">glue</span><span class=\"o\">.</span><span class=\"n\">runEpisode</span><span class=\"p\">(</span><span class=\"n\">max_steps</span><span class=\"o\">=</span><span class=\"mi\">1000</span><span class=\"p\">)</span>\n  File <span class=\"nb\">&quot;/home/kuquanghuy/venv/lib/python3.12/site-packages/RlGlue/rl_glue.py&quot;</span>, line <span class=\"m\">42</span>, in <span class=\"n\">runEpisode</span>\n<span class=\"w\">    </span><span class=\"n\">rl_step_result</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">step</span><span class=\"p\">()</span>\n<span class=\"w\">                     </span><span class=\"pm\">^^^^^^^^^^^</span>\n  File <span class=\"nb\">&quot;/home/kuquanghuy/venv/lib/python3.12/site-packages/RlGlue/rl_glue.py&quot;</span>, line <span class=\"m\">30</span>, in <span class=\"n\">step</span>\n<span class=\"w\">    </span><span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">last_action</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">agent</span><span class=\"o\">.</span><span class=\"n\">step</span><span class=\"p\">(</span><span class=\"n\">reward</span><span class=\"p\">,</span> <span class=\"n\">obs</span><span class=\"p\">)</span>\n<span class=\"w\">                       </span><span class=\"pm\">^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>\n  File <span class=\"nb\">&quot;/home/kuquanghuy/00-RL/Reproduced-Regularized-GradientTD/experiments/control/utils/rl_glue.py&quot;</span>, line <span class=\"m\">27</span>, in <span class=\"n\">step</span>\n<span class=\"w\">    </span><span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">agent</span><span class=\"o\">.</span><span class=\"n\">update</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">x</span><span class=\"p\">,</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"n\">r</span><span class=\"p\">,</span> <span class=\"n\">xp</span><span class=\"p\">,</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">gamma</span><span class=\"p\">)</span>\n  File <span class=\"nb\">&quot;/home/kuquanghuy/00-RL/Reproduced-Regularized-GradientTD/experiments/control/agents/BaseAgent.py&quot;</span>, line <span class=\"m\">69</span>, in <span class=\"n\">update</span>\n<span class=\"w\">    </span><span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">updateNetwork</span><span class=\"p\">(</span><span class=\"n\">samples</span><span class=\"p\">)</span>\n  File <span class=\"nb\">&quot;/home/kuquanghuy/00-RL/Reproduced-Regularized-GradientTD/experiments/control/agents/QRC.py&quot;</span>, line <span class=\"m\">107</span>, in <span class=\"n\">updateNetwork</span>\n<span class=\"w\">    </span><span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">h</span><span class=\"p\">[</span><span class=\"n\">a</span><span class=\"p\">]</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">h</span><span class=\"p\">[</span><span class=\"n\">a</span><span class=\"p\">]</span> <span class=\"o\">+</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">alpha</span> <span class=\"o\">*</span> <span class=\"n\">m</span> <span class=\"o\">/</span> <span class=\"p\">(</span><span class=\"n\">torch</span><span class=\"o\">.</span><span class=\"n\">sqrt</span><span class=\"p\">(</span><span class=\"n\">v</span><span class=\"p\">)</span> <span class=\"o\">+</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">eps</span><span class=\"p\">)</span>\n<span class=\"w\">                                              </span><span class=\"pm\">^^^^^^^^^^^^^</span>\n  File <span class=\"nb\">&quot;/home/kuquanghuy/venv/lib/python3.12/site-packages/marimo/_runtime/handlers.py&quot;</span>, line <span class=\"m\">51</span>, in <span class=\"n\">interrupt_handler</span>\n<span class=\"w\">    </span><span class=\"k\">raise</span> <span class=\"n\">MarimoInterrupt</span>\n<span class=\"gr\">KeyboardInterrupt</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
+        }
+      ]
+    },
+    {
+      "id": "TNsr",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    }
+  ]
+}

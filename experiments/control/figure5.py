@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-
+from multiprocessing import Pool
 from RlGlue import RlGlue
 from agents.QLearning import QLearning
 from agents.QRC import QRC
@@ -26,42 +26,41 @@ STEPSIZES = {
     'QRC': 0.0009765,
     'QC': 0.0009765,
 }
-
+torch.set_num_threads(1) 
 collector = Collector()
+def run_single(args):
+    run, Learner = args
+    #np.random.seed(run)
+    torch.manual_seed(run)
+    env = MountainCar()
 
-for run in range(RUNS):
-    for Learner in LEARNERS:
-        np.random.seed(run)
-        torch.manual_seed(run)
+    learner = Learner(env.features, env.num_actions, {
+        'alpha': STEPSIZES[Learner.__name__],
+        'epsilon': 0.1,
+        'beta': 1.0,
+        'target_refresh': 1,
+        'buffer_size': 4000,
+        'h1': 32,
+        'h2': 32,
+    })
 
-        env = MountainCar()
+    agent = RlGlueCompatWrapper(learner, gamma=0.99)
 
-        learner = Learner(env.features, env.num_actions, {
-            'alpha': STEPSIZES[Learner.__name__],
-            'epsilon': 0.1,
-            'beta': 1.0,
-            'target_refresh': 1,
-            'buffer_size': 4000,
-            'h1': 32,
-            'h2': 32,
-        })
+    glue = RlGlue(agent, env)
 
-        agent = RlGlueCompatWrapper(learner, gamma=0.99)
+    glue.start()
+    for episode in range(EPISODES):
+        glue.num_steps = 0
+        glue.total_reward = 0
+        glue.runEpisode(max_steps=1000)
+        print(Learner.__name__, run, episode, glue.num_steps)
 
-        glue = RlGlue(agent, env)
+        collector.collect(Learner.__name__, glue.total_reward)
 
-        glue.start()
-        for episode in range(EPISODES):
-            glue.num_steps = 0
-            glue.total_reward = 0
-            glue.runEpisode(max_steps=1000)
+    collector.reset()
 
-            print(Learner.__name__, run, episode, glue.num_steps)
-
-            collector.collect(Learner.__name__, glue.total_reward)
-
-        collector.reset()
-
+with Pool(processes=8) as pool:
+    all_results = pool.map(run_single, [(r, L) for r in range(RUNS) for L in LEARNERS])
 
 import matplotlib.pyplot as plt
 from utils.plotting import plot
