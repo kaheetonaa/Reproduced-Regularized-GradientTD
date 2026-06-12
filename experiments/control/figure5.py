@@ -11,8 +11,9 @@ from environments.MountainCar import MountainCar
 
 from utils.rl_glue import RlGlueCompatWrapper
 
-RUNS = 1 #10
-EPISODES = 3 #100
+ITERATION_NUMBER=0
+RUNS = 14#10
+EPISODES = 100 #100
 LEARNERS = [QRC, QC, QLearning]
 
 data={'QLearning': np.array([-1*np.ones(EPISODES) for i in range(RUNS)]),
@@ -34,9 +35,8 @@ STEPSIZES = {
 
 def run_single(args):
     run, Learner = args
-    print(run)
-    np.random.seed(run)
-    torch.manual_seed(run)
+    np.random.seed(run+ITERATION_NUMBER)
+    torch.manual_seed(run+ITERATION_NUMBER)
     env = MountainCar()
 
     learner = Learner(env.features, env.num_actions, {
@@ -60,18 +60,18 @@ def run_single(args):
         glue.total_reward = 0
         glue.runEpisode(max_steps=1000)
         results.append(int(glue.num_steps))
-        #print(Learner.__name__, run, episode, glue.num_steps)
+        print(Learner.__name__, run, episode, glue.num_steps)
     print(results)
-    return run,results
+    return results
 
 def main():
 	for L in LEARNERS:
-		with Pool(processes=3) as pool:
+		with Pool(processes=14) as pool:
 			_d = pool.map(run_single, [(r, L) for r in range(RUNS)])
-			data[L.__name__][_d[0][0]]=np.array(_d[0][1])
+			data[L.__name__]=np.array(_d[0])
 	print(data)
 	for key in data.keys():
-		np.save("data"+key+".npy",data[key])
+		np.save(str(ITERATION_NUMBER)+"data"+key+".npy",data[key])
 
 if __name__=="__main__":
 	freeze_support()
