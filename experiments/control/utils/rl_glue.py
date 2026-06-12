@@ -22,8 +22,8 @@ class RlGlueCompatWrapper(BaseAgent):
 
     # called on all subsequent steps of the episode except the terminal step
     def step(self, r, sp):
-        xp = torch.tensor(sp, device=device).unsqueeze(0)
-        r = torch.tensor(r, device=device).unsqueeze(0)
+        xp = torch.tensor(sp, device=device,dtype=torch.float32).unsqueeze(0)
+        r = torch.tensor(r, device=device,dtype=torch.float32).unsqueeze(0)
         self.agent.update(self.x, self.a, r, xp, self.gamma)
 
         self.s = sp

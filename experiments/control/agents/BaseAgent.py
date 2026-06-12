@@ -43,7 +43,7 @@ class BaseAgent:
         if np.random.rand() < self.epsilon:
             a = np.random.randint(self.actions)
             return torch.tensor(a, device=device)
-
+        #x = x.detach().clone().float().to(device)
         # otherwise take a greedy action
         q_s, _ = self.policy_net(x)
         # print(q_s)

@@ -27,7 +27,7 @@ class CartPole(BaseEnvironment):
 		self.kinematics_integrator = "euler"
 		self.theta_threshold_radians = 12 * 2 * math.pi / 360
 		self.x_threshold = 2.4
-		self.features = 2
+		self.features = 4
 		self.num_actions = 2
 		high = np.array([
 			self.x_threshold * 2,
@@ -43,7 +43,7 @@ class CartPole(BaseEnvironment):
 		self.velocity = 0.0
 		self.pole_angle=-0.6 + np.random.random() * 0.6
 		self.pole_angle_velocity=0
-		return (self.position, self.velocity)
+		return (self.position, self.velocity,self.pole_angle,self.pole_angle_velocity)
 
 	# give all actions for a given state
 	def actions(self, s):
@@ -81,8 +81,8 @@ class CartPole(BaseEnvironment):
 
 		if x < -self.x_threshold or x>self.x_threshold or theta < -self.theta_threshold_radians or theta >self.theta_threshold_radians:
 			return (x,x_dot, theta,theta_dot), True
-		else:
-			return (x,x_dot, theta,theta_dot), True
+		
+		return (x,x_dot, theta,theta_dot), False
 
 	def step(self, a):
 		s = (self.position, self.velocity,self.pole_angle,self.pole_angle_velocity)
