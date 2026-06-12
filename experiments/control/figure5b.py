@@ -11,8 +11,8 @@ from environments.CartPole import CartPole
 
 from utils.rl_glue import RlGlueCompatWrapper
 
-ITERATION_NUMBER=0 #0,15,29
-RUNS = 14 #10
+ITERATION_NUMBER=200 #0,15,29,200
+RUNS = 200 #10
 EPISODES = 100 #100
 LEARNERS = [QRC, QC, QLearning]
 
