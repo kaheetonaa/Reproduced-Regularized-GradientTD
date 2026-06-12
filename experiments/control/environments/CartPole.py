@@ -7,7 +7,7 @@ import math
 import numpy as np
 from RlGlue import BaseEnvironment
 
-BACK = -1
+BACK = 0
 FORWARD = 1
 
 class CartPole(BaseEnvironment):
@@ -27,7 +27,7 @@ class CartPole(BaseEnvironment):
 		self.kinematics_integrator = "euler"
 		self.theta_threshold_radians = 12 * 2 * math.pi / 360
 		self.x_threshold = 2.4
-		self.features = 4
+		self.features = 2
 		self.num_actions = 2
 		high = np.array([
 			self.x_threshold * 2,
@@ -55,7 +55,7 @@ class CartPole(BaseEnvironment):
 
 	# get the next state and termination status
 	def next_state(self, s, a):
-		a = a
+		action = a
 		x, x_dot, theta, theta_dot = s
 		force = self.force_mag if action == 1 else -self.force_mag
 		costheta = np.cos(theta)

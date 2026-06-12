@@ -12,7 +12,7 @@ from environments.CartPole import CartPole
 from utils.rl_glue import RlGlueCompatWrapper
 
 RUNS = 1 #10
-EPISODES = 1 #100
+EPISODES = 20 #100
 LEARNERS = [QRC, QC, QLearning]
 
 data={'QLearning': np.array([-1*np.ones(EPISODES) for i in range(RUNS)]),
@@ -58,7 +58,7 @@ def run_single(args):
     for episode in range(EPISODES):
         glue.num_steps = 0
         glue.total_reward = 0
-        glue.runEpisode(max_steps=1000)
+        glue.runEpisode(max_steps=400)
         results.append(int(glue.num_steps))
     print(results)
     return run,results
