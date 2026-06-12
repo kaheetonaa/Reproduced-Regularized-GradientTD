@@ -11,8 +11,8 @@ from environments.MountainCar import MountainCar
 
 from utils.rl_glue import RlGlueCompatWrapper
 
-ITERATION_NUMBER=0
-RUNS = 14#10
+ITERATION_NUMBER=0 #0,15,29
+RUNS = 14#14
 EPISODES = 100 #100
 LEARNERS = [QRC, QC, QLearning]
 
@@ -61,14 +61,18 @@ def run_single(args):
         glue.runEpisode(max_steps=1000)
         results.append(int(glue.num_steps))
         print(Learner.__name__, run, episode, glue.num_steps)
-    print(results)
+    print("Finished run", run, "for", Learner.__name__)
+
     return results
 
 def main():
 	for L in LEARNERS:
 		with Pool(processes=14) as pool:
 			_d = pool.map(run_single, [(r, L) for r in range(RUNS)])
-			data[L.__name__]=np.array(_d[0])
+			for r in range(len(_d)):
+				data[L.__name__][r,:] = _d[r]
+   
+
 	print(data)
 	for key in data.keys():
 		np.save(str(ITERATION_NUMBER)+"data"+key+".npy",data[key])
