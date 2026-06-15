@@ -11,9 +11,9 @@ from environments.CartPole import CartPole
 
 from utils.rl_glue import RlGlueCompatWrapper
 
-ITERATION_NUMBER=200 #0,15,29,200
-RUNS = 200 #10
-EPISODES = 100 #100
+ITERATION_NUMBER=229 #0,15,29,200
+RUNS = 14 #10
+EPISODES = 250 #100
 LEARNERS = [QRC, QC, QLearning]
 
 data={'QLearning': np.array([-1*np.ones(EPISODES) for i in range(RUNS)]),

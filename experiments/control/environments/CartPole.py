@@ -12,9 +12,9 @@ FORWARD = 1
 
 class CartPole(BaseEnvironment):
 	def __init__(self):
-		self.position = -0.6 + np.random.random() * 0.6
+		self.position = -0.05 + np.random.random() * 0.05
 		self.velocity = 0.0
-		self.pole_angle=-0.6 + np.random.random() * 0.6
+		self.pole_angle=-0.05 + np.random.random() * 0.05
 		self.pole_angle_velocity=0
 		self.gravity = 9.8
 		self.masscart = 1.0
@@ -39,9 +39,9 @@ class CartPole(BaseEnvironment):
 		)
 
 	def start(self):
-		self.position = -0.6 + np.random.random() * 0.6
+		self.position = -0.05 + np.random.random() * 0.05
 		self.velocity = 0.0
-		self.pole_angle=-0.6 + np.random.random() * 0.6
+		self.pole_angle=-0.05 + np.random.random() * 0.05
 		self.pole_angle_velocity=0
 		return (self.position, self.velocity,self.pole_angle,self.pole_angle_velocity)
 
