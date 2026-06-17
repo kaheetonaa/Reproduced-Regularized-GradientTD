@@ -636,7 +636,7 @@ def _(
 
 @app.cell
 def eta(eta_sensitivity, plot_compare_sensitivity):
-    plot_compare_sensitivity(eta_sensitivity,-6,6,top_lim=3,bot_lim=0)
+    plot_compare_sensitivity(eta_sensitivity,-6,6,top_lim=10,bot_lim=0)
     return
 
 
