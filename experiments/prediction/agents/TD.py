@@ -14,7 +14,7 @@ class TD:
         v = self.w.dot(x)
         vp = self.w.dot(xp)
 
-        delta = r + self.gamma * vp - v
+        delta   = np.clip(r + self.gamma * vp - v, -50000, 50000)
 
         self.w = self.w + self.alpha * rho * delta * x
 

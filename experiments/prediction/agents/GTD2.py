@@ -16,8 +16,8 @@ class GTD2:
         v = self.w.dot(x)
         vp = self.w.dot(xp)
 
-        delta = r + self.gamma * vp - v
-        delta_hat = self.h.dot(x)
+        delta   = np.clip(r + self.gamma * vp - v, -50000, 50000)
+        delta_hat = np.clip(self.h.dot(x),         -50000, 50000)
 
         dw = rho * (delta_hat * x - self.gamma * delta_hat * xp)
         dh = (rho * delta - delta_hat) * x

@@ -77,7 +77,7 @@ def _(
     # Set up parameters for experiment
     # --------------------------------
 
-    RUNS = 10
+    RUNS = 200
     LEARNERS = [GTD2, TDC, Vtrace, HTD, TD, TDRC]
 
     PROBLEMS = [
@@ -374,9 +374,10 @@ def _(
         for alpha_power in range(_range_min,_range_max):
             alpha=2**(-alpha_power)
 
-            for run in range(RUNS):
+            for run in range(int(RUNS/(_range_max-_range_min))):
                 for problem in PROBLEMS:
                     for Learner in LEARNERS:
+                        np.random.seed(run*3)
 
                         problem['stepsizes'][Learner.__name__]=alpha
                         # for reproducibility, set the random seed for each run
@@ -507,19 +508,17 @@ def _(LEARNERS, PROBLEMS):
         print(data)
         for _r in _rep:
             df=pd.DataFrame(data[_r])
-        
+
             plot=df.plot(title=_r)
             plot.set_ylim(top=top_lim,bottom=bot_lim)
         return plt.show()
-
-
 
     return (plot_compare_sensitivity,)
 
 
 @app.cell
 def _(alpha_sensitivity, plot_compare_sensitivity):
-    plot_compare_sensitivity(alpha_sensitivity,0,8,top_lim=5,bot_lim=0)
+    plot_compare_sensitivity(alpha_sensitivity,0,8,top_lim=2,bot_lim=0)
     return
 
 
@@ -547,10 +546,11 @@ def _(
         # a convenience object to store data collected during runs
         # H: update alpha sensitivity in _range from 0 to 5, return collectors with key=alpha, value=collector   
         collector = Collector()
-        for eta in range(_range_min,_range_max):
-            for run in range(RUNS):
+        for _e in range(_range_min,_range_max):
+            for run in range(int(RUNS/(_range_max-_range_min))):
                 for problem in PROBLEMS:
                     for Learner in LEARNERS:
+                        eta=2**(_e)
 
                         # for reproducibility, set the random seed for each run
                         # also reset the seed for each learner, so we guarantee each sees the same data
@@ -621,7 +621,7 @@ def _(
                                     rmspbe=_max
                                     terminal=True
                                 #  create a unique key to store the data for this env/representation/agent tuple
-                                data_key = f'{eta}-{Env.__name__}-{Rep.__name__}-{Learner.__name__}'
+                                data_key = f'{_e}-{Env.__name__}-{Rep.__name__}-{Learner.__name__}'
                                 # store the data in the "collector" until we need it for plotting
                                 collector.collect(data_key, rmspbe)
 
@@ -630,13 +630,13 @@ def _(
         return collector
 
 
-    eta_sensitivity=eta_sensitivity(-8,8,9e+200)
+    eta_sensitivity=eta_sensitivity(-6,6,9e+200)
     return (eta_sensitivity,)
 
 
 @app.cell
 def eta(eta_sensitivity, plot_compare_sensitivity):
-    plot_compare_sensitivity(eta_sensitivity,-8,8,top_lim=3,bot_lim=0)
+    plot_compare_sensitivity(eta_sensitivity,-6,6,top_lim=3,bot_lim=0)
     return
 
 
@@ -661,10 +661,11 @@ def _(
         # a convenience object to store data collected during runs
         # H: update alpha sensitivity in _range from 0 to 5, return collectors with key=alpha, value=collector   
         collector = Collector()
-        for beta in range(_range_min,_range_max):
-            for run in range(RUNS):
+        for _b in range(_range_min,_range_max):
+            for run in range(int(RUNS/(_range_max-_range_min))):
                 for problem in PROBLEMS:
                     for Learner in LEARNERS:
+                        beta=2**(_b)
 
                         # for reproducibility, set the random seed for each run
                         # also reset the seed for each learner, so we guarantee each sees the same data
@@ -727,7 +728,7 @@ def _(
                                     rmspbe=_max
                                     terminal=True
                                 #  create a unique key to store the data for this env/representation/agent tuple
-                                data_key = f'{beta}-{Env.__name__}-{Rep.__name__}-{Learner.__name__}'
+                                data_key = f'{_b}-{Env.__name__}-{Rep.__name__}-{Learner.__name__}'
                                 # store the data in the "collector" until we need it for plotting
                                 collector.collect(data_key, rmspbe)
 
@@ -736,18 +737,25 @@ def _(
         return collector
 
 
-    beta_sensitivity=beta_sensitivity(0,8,9e+200)
+    beta_sensitivity=beta_sensitivity(-3,3,9e+200)
     return (beta_sensitivity,)
 
 
 @app.cell
 def _(beta_sensitivity, plot_compare_sensitivity):
-    plot_compare_sensitivity(beta_sensitivity,0,8,top_lim=2,bot_lim=0)
+    plot_compare_sensitivity(beta_sensitivity,-3,3,top_lim=2.5,bot_lim=2)
     return
 
 
 @app.cell
 def _():
+    return
+
+
+@app.cell
+def _():
+    import marimo as mo
+
     return
 
 

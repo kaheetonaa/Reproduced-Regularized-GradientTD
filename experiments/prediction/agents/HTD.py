@@ -16,8 +16,8 @@ class HTD:
         v = self.w.dot(x)
         vp = self.w.dot(xp)
 
-        delta = r + self.gamma * vp - v
-        delta_hat = self.h.dot(x)
+        delta   = np.clip(r + self.gamma * vp - v, -50000, 50000)
+        delta_hat = np.clip(self.h.dot(x),         -50000, 50000)
 
         dh = (rho * delta * x - delta_hat * (x - self.gamma * xp))
         dw = rho * delta * x + (x - self.gamma * xp) * (rho - 1) * delta_hat
