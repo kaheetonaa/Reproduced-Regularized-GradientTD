@@ -185,12 +185,12 @@ def _(
     ]
 
     COLORS = {
-        'TD': 'lightgray',
-        'TDC': 'lightgray',
-        'TDRC': 'pink',
-        'GTD2': 'lightgray',
-        'Vtrace': 'lightgray',
-        'HTD': 'lightgray',
+        'TD': 'violet',
+        'TDC': 'orange',
+        'TDRC': 'brown',
+        'GTD2': 'blue',
+        'Vtrace': 'green',
+        'HTD': 'red',
     } # H: change color
 
     PROBLEMS=PROBLEMS #[:-1] # H:remove baird problem
@@ -284,7 +284,6 @@ def _(
 
                 # tell the data collector we're done collecting data for this env/learner/rep combination
                 collector.reset()
-
     return collector, rmspbe
 
 
@@ -450,7 +449,7 @@ def _(
         return collector
 
 
-    alpha_sensitivity=alpha_sensitivity(0,8,9e+200)
+    alpha_sensitivity=alpha_sensitivity(0,8,100)
     return alpha_sensitivity, math
 
 
@@ -505,10 +504,12 @@ def _(LEARNERS, PROBLEMS):
                     data[rep][learner]+={auc}
 
         #return plt.show()
+        print(data)
         for _r in _rep:
             df=pd.DataFrame(data[_r])
+        
             plot=df.plot(title=_r)
-            plot.set_ylim(top=top_lim,bottom=bot_lim) 
+            plot.set_ylim(top=top_lim,bottom=bot_lim)
         return plt.show()
 
 
@@ -518,7 +519,7 @@ def _(LEARNERS, PROBLEMS):
 
 @app.cell
 def _(alpha_sensitivity, plot_compare_sensitivity):
-    plot_compare_sensitivity(alpha_sensitivity,0,8,top_lim=2,bot_lim=0)
+    plot_compare_sensitivity(alpha_sensitivity,0,8,top_lim=5,bot_lim=0)
     return
 
 
@@ -634,8 +635,8 @@ def _(
 
 
 @app.cell
-def _(eta_sensitivity, plot_compare_sensitivity):
-    plot_compare_sensitivity(eta_sensitivity,-8,8,top_lim=1,bot_lim=0)
+def eta(eta_sensitivity, plot_compare_sensitivity):
+    plot_compare_sensitivity(eta_sensitivity,-8,8,top_lim=3,bot_lim=0)
     return
 
 
@@ -648,7 +649,6 @@ def _(
     RlGlue,
     RlGlueCompatWrapper,
     buildRMSPBE,
-    eta,
     math,
     np,
 ):
@@ -727,7 +727,7 @@ def _(
                                     rmspbe=_max
                                     terminal=True
                                 #  create a unique key to store the data for this env/representation/agent tuple
-                                data_key = f'{eta}-{Env.__name__}-{Rep.__name__}-{Learner.__name__}'
+                                data_key = f'{beta}-{Env.__name__}-{Rep.__name__}-{Learner.__name__}'
                                 # store the data in the "collector" until we need it for plotting
                                 collector.collect(data_key, rmspbe)
 
@@ -742,7 +742,12 @@ def _(
 
 @app.cell
 def _(beta_sensitivity, plot_compare_sensitivity):
-    plot_compare_sensitivity(beta_sensitivity,0,8,top_lim=1,bot_lim=0)
+    plot_compare_sensitivity(beta_sensitivity,0,8,top_lim=2,bot_lim=0)
+    return
+
+
+@app.cell
+def _():
     return
 
 
